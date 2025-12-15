@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password | Smart Attendance</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-hover: #2980b9;
+            --accent: #00c6ff;
+            --dark-blue: #0a192f;
+            --darker-blue: #081425;
+            --midnight-blue: #0f1c32;
+            --sky-blue: #1e3a5f;
+            --text: #ecf0f1;
+            --text-light: #bdc3c7;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            --glow: 0 0 15px rgba(52, 152, 219, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--darker-blue) 0%, var(--midnight-blue) 50%, var(--sky-blue) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 科技感背景 */
+        .tech-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        /* 发光线条 */
+        .glow-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            height: 1px;
+            width: 100%;
+            opacity: 0.7;
+            filter: blur(1px);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .glow-line:nth-child(1) {
+            top: 20%;
+            animation: moveLine 15s linear infinite;
+        }
+
+        .glow-line:nth-child(2) {
+            top: 50%;
+            animation: moveLine 20s linear infinite reverse;
+        }
+
+        .glow-line:nth-child(3) {
+            top: 80%;
+            animation: moveLine 25s linear infinite;
+        }
+
+        /* 垂直发光线条 */
+        .glow-line-vertical {
+            position: absolute;
+            background: linear-gradient(180deg, transparent, var(--primary), transparent);
+            width: 1px;
+            height: 100%;
+            opacity: 0.5;
+            filter: blur(1px);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .glow-line-vertical:nth-child(4) {
+            left: 20%;
+            animation: moveLineVertical 18s linear infinite;
+        }
+
+        .glow-line-vertical:nth-child(5) {
+            left: 60%;
+            animation: moveLineVertical 22s linear infinite reverse;
+        }
+
+        @keyframes moveLine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes moveLineVertical {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100%);
+            }
+        }
+
+        /* 浮动科技元素 */
+        .tech-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent);
+            opacity: 0.1;
+            animation: floatElement 20s infinite ease-in-out;
+        }
+
+        .tech-element:nth-child(6) {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .tech-element:nth-child(7) {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            right: 10%;
+            animation-delay: 5s;
+        }
+
+        .tech-element:nth-child(8) {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            right: -50px;
+            animation-delay: 10s;
+        }
+
+        @keyframes floatElement {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(180deg);
+            }
+        }
+
+        /* 主容器 */
+        .reset-container {
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow), var(--glow);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 左侧信息面板 */
+        .info-panel {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(15, 30, 55, 0.9) 0%, rgba(30, 58, 95, 0.8) 100%);
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .info-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233498db' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .info-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-panel h1 {
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .info-panel p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .features li::before {
+            content: '✓';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        /* 右侧表单面板 */
+        .form-panel {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(20, 35, 60, 0.9) 0%, rgba(40, 70, 110, 0.8) 100%);
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            justify-content: center;
+            margin-top: 80px !important;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        }
+
+        .form-panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--text);
+            text-align: center;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: 15px;
+            font-size: 2rem;
+        }
+
+        .form-panel p {
+            color: var(--text-light);
+            margin-bottom: 40px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1.5px solid rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: rgba(30, 45, 70, 0.7);
+            color: var(--text);
+        }
+
+        input[type="email"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        input[type="email"]::placeholder {
+            color: var(--text-light);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .success {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 25px;
+            font-size: 0.95rem;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            margin-top: 0px;
+        }
+
+        .links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+            color: var(--accent);
+        }
+
+        /* 粒子容器 */
+        #particles-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        /* 响应式设计 - 平板 */
+        @media (max-width: 1024px) {
+            .reset-container {
+                max-width: 90%;
+            }
+
+            .info-panel,
+            .form-panel {
+                padding: 40px 30px;
+            }
+
+            .info-panel h1 {
+                font-size: 2rem;
+            }
+
+            .form-panel h2 {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* 响应式设计 - 手机 */
+        @media (max-width: 768px) {
+            .reset-container {
+                flex-direction: column;
+                max-width: 95%;
+                margin: 20px auto;
+            }
+
+            .info-panel {
+                padding: 30px 25px;
+                border-radius: 15px 15px 0 0;
+            }
+
+            .form-panel {
+                padding: 30px 25px;
+                border-radius: 0 0 15px 15px;
+            }
+
+            .info-panel h1 {
+                font-size: 1.8rem;
+                text-align: center;
+            }
+
+            .form-panel h2 {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .info-panel p,
+            .form-panel p {
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .logo {
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            .features li {
+                font-size: 0.9rem;
+            }
+
+            input[type="email"],
+            button {
+                padding: 14px 16px;
+                font-size: 0.95rem;
+            }
+
+            .links {
+                flex-direction: column;
+                gap: 4px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 响应式设计 - 小手机 */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .reset-container {
+                max-width: 100%;
+                margin: 10px auto;
+            }
+
+            .info-panel,
+            .form-panel {
+                padding: 25px 20px;
+            }
+
+            .info-panel h1 {
+                font-size: 1.6rem;
+
+            }
+
+            .form-panel h2 {
+                font-size: 1.4rem;
+            }
+
+            .info-panel p,
+            .form-panel p {
+                font-size: 0.95rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+
+            .logo-icon {
+                width: 35px;
+                height: 35px;
+            }
+
+            .features li {
+                font-size: 0.85rem;
+            }
+
+            input[type="email"],
+            button {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+
+            .message {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .links {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 科技感背景 -->
+    <div class="tech-background">
+        <div class="glow-line"></div>
+        <div class="glow-line"></div>
+        <div class="glow-line"></div>
+        <div class="glow-line-vertical"></div>
+        <div class="glow-line-vertical"></div>
+        <div class="tech-element"></div>
+        <div class="tech-element"></div>
+        <div class="tech-element"></div>
+        <div id="particles-container"></div>
+    </div>
+
+    <div class="reset-container">
+        <!-- 左侧信息面板 -->
+        <div class="info-panel">
+            <div class="info-content">
+                <h1>Smart Attendance</h1>
+                <p>Attendance system for efficient workforce management.</p>
+                <ul class="features">
+                    <li>Secure password recovery system</li>
+                    <li>Enterprise-grade authentication</li>
+                    <li>Real-time security monitoring</li>
+                    <li>Mobile and desktop compatible</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 右侧表单面板 -->
+        <div class="form-panel">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <h2>Reset Your Password</h2>
+            </div>
+
+            <p>Enter your email address and we'll send you a link to reset your password.</p>
+
+            <div class="input-group">
+                <input type="email" id="resetEmail" placeholder="Enter your registered email" autocomplete="email">
+            </div>
+
+            <button onclick="sendResetEmail()">
+                <i class="fas fa-paper-plane"></i>
+                Send Reset Email
+            </button>
+
+            <div class="message" id="resetMessage"></div>
+
+            <div class="links">
+                <span>Remember your password?</span>
+                <a href="index.html">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXM92nMwpSqPVWifILYeDMTMEh_fuhN5M",
+            authDomain: "drive-thru-smartattendance.firebaseapp.com",
+            databaseURL: "https://drive-thru-smartattendance-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "drive-thru-smartattendance",
+            storageBucket: "drive-thru-smartattendance.appspot.com",
+            messagingSenderId: "235048051665",
+            appId: "1:235048051665:web:a8c68cc40eb83946e9f6f0"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // 创建动态粒子
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+
+                // 随机位置和动画延迟
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const size = Math.random() * 3 + 1;
+                const delay = Math.random() * 20;
+
+                particle.style.position = 'absolute';
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}%`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.borderRadius = '50%';
+                particle.style.animation = `floatParticle ${Math.random() * 20 + 10}s linear infinite`;
+                particle.style.animationDelay = `${delay}s`;
+
+                // 随机颜色
+                const colors = ['#3498db', '#00c6ff', '#2980b9'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                particle.style.boxShadow = `0 0 5px ${color}`;
+                particle.style.opacity = Math.random() * 0.5 + 0.2;
+
+                container.appendChild(particle);
+            }
+
+            // 添加粒子动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatParticle {
+                    0% {
+                        transform: translate(0, 0);
+                    }
+                    25% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                    }
+                    50% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                    }
+                    75% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                    }
+                    100% {
+                        transform: translate(0, 0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function sendResetEmail() {
+            const email = document.getElementById('resetEmail').value.trim().toLowerCase();
+            const msg = document.getElementById('resetMessage');
+            msg.textContent = '';
+            msg.className = 'message';
+
+            if (!email) {
+                msg.textContent = "Please enter your email address.";
+                msg.classList.add('error');
+                return;
+            }
+
+            // 显示加载状态
+            const btn = document.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.disabled = true;
+
+            firebase.auth().sendPasswordResetEmail(email)
+                .then(() => {
+                    msg.textContent = "Reset link sent to your email. Please check your inbox.";
+                    msg.classList.add('success');
+                    document.getElementById('resetEmail').value = '';
+                })
+                .catch(err => {
+                    if (err.code === "auth/user-not-found") {
+                        msg.textContent = "No account found with this email address. (Only works for Email/Password accounts)";
+                    } else if (err.code === "auth/invalid-email") {
+                        msg.textContent = "Please enter a valid email address.";
+                    } else {
+                        msg.textContent = "Error: " + err.message;
+                    }
+                    msg.classList.add('error');
+                })
+                .finally(() => {
+                    // 重置按钮状态
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+        }
+
+        // 允许使用Enter键提交表单
+        document.getElementById('resetEmail').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendResetEmail();
+            }
+        });
+
+        // 页面加载时初始化粒子
+        window.addEventListener('load', createParticles);
+    </script>
+</body>
+
+</html>

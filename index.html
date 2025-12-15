@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Smart Attendance System by Team Naufal KV Seberang Perai" />
+  <title>Smart Attendance – Sign In</title>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-container {
+      background: #fbfbfc;
+      width: 100%;
+      max-width: 440px;
+      padding: 30px 25px;
+      border-radius: 18px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+      height: 600px;
+      /* adjust this value */
+
+    }
+
+    .login-logo {
+      width: 320px !important;
+      height: auto;
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .login-logo:hover {
+      transform: scale(1.05);
+    }
+
+    .portal-title {
+      font-size: 25px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-top: 8px;
+    }
+
+    .portal-subtitle {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+      outline: none;
+    }
+
+    .show-password-container {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 5px 0 10px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .show-password-container input {
+      width: auto;
+      margin-right: 8px;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0f5bb5;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 13px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.3s;
+    }
+
+    .google-btn:hover {
+      background: #f5f5f5;
+    }
+
+    .link-row {
+      margin-top: 18px;
+      font-size: 14px;
+    }
+
+    .link-row a {
+      color: #1a73e8;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .link-row a:hover {
+      text-decoration: underline;
+      color: #0f5bb5;
+    }
+
+    #authMessage {
+      margin-top: 15px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    footer {
+      margin-top: -23px;
+      font-size: 12px;
+      color: #777;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+
+    /* For screens up to 900px */
+    @media (max-width: 900px) {
+      .login-container {
+        max-width: 400px;
+        padding: 25px 20px;
+        height: 550px;
+        /* adjust this value */
+      }
+
+      .login-logo {
+        width: 280px;
+      }
+
+      .portal-title {
+        font-size: 21px;
+      }
+
+      .portal-subtitle {
+        font-size: 16px;
+      }
+
+      input {
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      .btn,
+      .google-btn {
+        padding: 12px;
+        font-size: 16px;
+      }
+    }
+
+    /* For screens up to 600px */
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      .login-container {
+        max-width: 350px;
+        padding: 20px 15px;
+        border-radius: 15px;
+      }
+
+      .login-logo {
+        width: 240px;
+      }
+
+      .portal-title {
+        font-size: 20px;
+      }
+
+      .portal-subtitle {
+        font-size: 15px;
+        margin-bottom: 20px;
+      }
+
+      input {
+        padding: 11px;
+        font-size: 14px;
+      }
+
+      .btn,
+      .google-btn {
+        padding: 11px;
+        font-size: 15px;
+      }
+
+      .link-row {
+        font-size: 13px;
+      }
+
+      footer {
+        font-size: 11px;
+      }
+    }
+
+    /* For screens up to 400px */
+    @media (max-width: 400px) {
+      body {
+        padding: 10px;
+      }
+
+      .login-container {
+        max-width: 100%;
+        padding: 18px 12px;
+        border-radius: 12px;
+      }
+
+      .login-logo {
+        width: 200px;
+      }
+
+      .portal-title {
+        font-size: 21px;
+      }
+
+      .portal-subtitle {
+        font-size: 14px;
+        margin-bottom: 18px;
+      }
+
+      input {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .btn,
+      .google-btn {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .show-password-container {
+        font-size: 13px;
+      }
+
+      .link-row {
+        font-size: 12px;
+      }
+
+      footer {
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+    <img src="https://kvseberangperai.weebly.com/uploads/1/1/2/2/112256679/logo-kv-baharu_orig.png" class="login-logo"
+      alt="KV Seberang Perai Logo" />
+
+    <div class="portal-title">Sistem Attendance</div>
+    <div class="portal-subtitle">TEAM NAUFAL</div>
+
+    <input type="email" id="email" placeholder="Enter your email" />
+    <input type="password" id="password" placeholder="Enter your password" />
+
+    <div class="show-password-container">
+      <input type="checkbox" id="showPassword" onclick="togglePassword()" />
+      <label for="showPassword">Show password</label>
+    </div>
+
+    <button class="btn" onclick="signIn()">Sign In</button>
+
+    <button class="google-btn" id="googleLoginBtn">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;">
+      Sign in with Google
+    </button>
+
+    <div class="link-row">
+      <a href="forgot.html">Forgot password?</a> •
+      <a href="signup.html">Create account</a>
+    </div>
+
+    <div id="authMessage"></div>
+
+    <footer>
+      © 2025 Team Naufal – KV Seberang Perai
+    </footer>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXM92nMwpSqPVWifILYeDMTMEh_fuhN5M",
+      authDomain: "drive-thru-smartattendance.firebaseapp.com",
+      databaseURL: "https://drive-thru-smartattendance-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "drive-thru-smartattendance",
+      storageBucket: "drive-thru-smartattendance.appspot.com",
+      messagingSenderId: "235048051665",
+      appId: "1:235048051665:web:a8c68cc40eb83946e9f6f0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
+    // ✅ Redirect if already logged in
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) window.location.href = "dashboard.html";
+    });
+
+    function togglePassword() {
+      const input = document.getElementById("password");
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    // ✅ Show fade message
+    function showMessage(text, color) {
+      const msg = document.getElementById("authMessage");
+      msg.style.color = color;
+      msg.textContent = text;
+      msg.style.opacity = "1";
+      msg.style.transition = "opacity 0.6s ease";
+      setTimeout(() => (msg.style.opacity = "0"), 3500);
+    }
+
+    // ✅ Email & password sign in
+    function signIn() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        showMessage("⚠️ Please fill in all fields.", "red");
+        return;
+      }
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+          showMessage("✅ Login successful! Redirecting...", "green");
+          setTimeout(() => (window.location.href = "dashboard.html"), 1000);
+        })
+        .catch(err => {
+          let message = "❌ Something went wrong. Please try again.";
+          switch (err.code) {
+            case "auth/invalid-email":
+              message = "⚠️ Please enter a valid email address.";
+              break;
+            case "auth/user-not-found":
+              message = "❌ No account found with this email.";
+              break;
+            case "auth/wrong-password":
+            case "auth/invalid-login-credentials":
+              message = "❌ Incorrect email or password.";
+              break;
+            case "auth/network-request-failed":
+              message = "🌐 Network error. Please check your connection.";
+              break;
+          }
+          showMessage(message, "red");
+        });
+    }
+
+    // ✅ Google login (existing users only)
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    async function signInWithGoogle() {
+      const msg = document.getElementById("authMessage");
+      showMessage("⏳ Checking your account...", "#555");
+
+      try {
+        // Step 1: Use popup to get Google account info
+        const result = await firebase.auth().signInWithPopup(provider);
+        const email = result.user.email;
+
+        // Step 2: Check if this email already exists
+        const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+
+        if (methods.length === 0) {
+          // ❌ New account — block creation
+          await firebase.auth().signOut();
+          showMessage("⚠️ This Google account is not registered. Please sign up first.", "orange");
+          return;
+        }
+
+        // ✅ Existing user — allow access
+        showMessage(`✅ Welcome back ${result.user.displayName || result.user.email}!`, "green");
+        setTimeout(() => (window.location.href = "dashboard.html"), 1000);
+
+      } catch (error) {
+        // If popup closed or network failed
+        if (error.code === "auth/popup-closed-by-user") {
+          showMessage("⚠️ Google sign-in was cancelled.", "orange");
+        } else if (error.code === "auth/network-request-failed") {
+          showMessage("🌐 Network error. Please check your connection.", "red");
+        } else {
+          showMessage("❌ Unable to sign in. Please try again.", "red");
+        }
+      }
+    }
+
+    document.getElementById("googleLoginBtn").addEventListener("click", signInWithGoogle);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign Up - Smart Attendance</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #1a73e8;
+      --blue-dark: #1669c1;
+      --muted: #6b7280;
+      --card: #ffffff;
+      --bg: #f4f6fb;
+      --radius: 12px;
+      --glass: rgba(255, 255, 255, 0.75);
+    }
+
+    .google-btn-container {
+      display: flex;
+      justify-content: center;
+      margin-top: -10px;
+      margin-bottom: -10px;
+    }
+
+    .google-btn {
+      background-color: #fff;
+      color: #444;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      max-width: 320px;
+      transition: all 0.2s ease;
+    }
+
+    .google-btn img {
+      width: 22px;
+      height: 22px;
+    }
+
+    .google-btn:hover {
+      background-color: #f6f6f6;
+      border-color: #ccc;
+    }
+
+    #authMessage {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0%, #f4f6fb 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      display: grid;
+      grid-template-columns: 1fr 520px;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 28px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(26, 115, 232, 0.08), rgba(26, 115, 232, 0.03));
+      box-shadow: 0 8px 30px rgba(21, 41, 82, 0.06);
+      height: 520px;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .brand .logo {
+      width: 100%;
+      height: 300px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      box-shadow: 0 6px 18px rgba(26, 115, 232, 0.08);
+    }
+
+    .brand .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .brand h1 {
+      font-size: 16px;
+      color: #0f1724;
+    }
+
+    .brand p {
+      color: var(--muted);
+      line-height: 1.5;
+      text-align: justify;
+      font-size: 16px;
+    }
+
+    .feature-list {
+      margin-top: 6px;
+      display: grid;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .feature .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 520px;
+    }
+
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .card p.lead {
+      color: var(--muted);
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px 12px 44px;
+      /* 只在左侧添加padding */
+      border: 1px solid #e6eaf0;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: box-shadow 0.18s, border-color 0.18s;
+      height: 44px;
+      line-height: 20px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 6px 18px rgba(26, 115, 232, 0.08);
+    }
+
+    .toggle-eye {
+      position: absolute;
+      left: 14px;
+      /* 确保在左侧 */
+      top: 38px;
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      fill: #6b7280;
+      opacity: 0.75;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 2;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+    }
+
+    /* 确保没有右侧眼睛图标 */
+    .toggle-eye[right] {
+      display: none !important;
+    }
+
+    .toggle-eye:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .toggle-eye.active {
+      fill: var(--blue);
+    }
+
+    .helper {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: left;
+    }
+
+    .error {
+      color: #dc2626;
+      font-size: 13px;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .success {
+      color: #16a34a;
+      font-size: 13px;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--blue);
+      color: white;
+      border: 0;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      transition: background 0.12s;
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-dark);
+    }
+
+    .or-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      color: var(--muted);
+    }
+
+    .or-line::before,
+    .or-line::after {
+      content: "";
+      height: 1px;
+      background: #eef2ff;
+      flex: 1;
+      border-radius: 2px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      font-size: 15px;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-left: 115px;
+    }
+
+    .footer-links a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+
+    /* --- Tablet / Small Laptop (max 900px) --- */
+    @media (max-width: 900px) {
+
+      .card p.lead {
+        color: var(--muted);
+        margin-bottom: 16px;
+        text-align: left;
+        font-size: 12px;
+      }
+
+
+      .feature-list {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        /* susun menegak */
+        align-items: flex-start;
+        /* semua mula dari kiri */
+        gap: 10px;
+        text-align: left;
+        font-size: 13px;
+      }
+
+      .feature {
+        display: flex;
+        align-items: center;
+        /* sejajarkan tengah */
+        justify-content: flex-start;
+        gap: 10px;
+        color: var(--muted);
+        width: 100%;
+        text-align: left;
+        font-size: 13px;
+      }
+
+      .feature .icon {
+        width: 28px;
+        /* lebih kecil daripada 36px */
+        height: 28px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.986);
+        /* lebih lembut */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        /* saiz emoji tetap */
+        color: var(--blue);
+        flex-shrink: 0;
+        padding: 0;
+        /* buang padding lebihan */
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        max-width: 700px;
+        text-align: center;
+      }
+
+      .brand {
+        height: 10px;
+        padding: -5px;
+      }
+
+      .brand .logo {
+        height: 100px;
+        width: 100%;
+
+      }
+
+      .brand .logo img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+      }
+
+      .brand h1 {
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .brand p {
+        font-size: 15px;
+      }
+
+      .card {
+        height: auto;
+        padding: 24px;
+      }
+
+      .footer-links {
+        margin-left: 0;
+        justify-content: center;
+      }
+    }
+
+    /* --- Large Phone (max 600px) --- */
+    @media (max-width: 600px) {
+      body {
+        padding: 16px;
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+      }
+
+      /* ubah susunan - brand di atas, card di bawah */
+      .brand {
+        display: block;
+        order: -1;
+        text-align: center;
+        padding: 20px 10px;
+        height: auto;
+      }
+
+      .brand .logo {
+        height: 180px;
+        margin-bottom: 10px;
+      }
+
+      .brand h1 {
+        font-size: 15px;
+        margin-bottom: 8px;
+        font-weight: 900;
+      }
+
+      .brand p {
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+
+      .card {
+        height: auto;
+        padding: 22px 18px;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+      }
+
+      .card h2 {
+        font-size: 18px;
+      }
+
+      .btn-primary,
+      .google-btn {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      input[type="email"],
+      input[type="password"],
+      input[type="text"] {
+        font-size: 14px;
+        height: 42px;
+      }
+
+      .footer-links {
+        font-size: 14px;
+        justify-content: center;
+      }
+    }
+
+    /* --- Small Phone (max 400px) --- */
+    @media (max-width: 400px) {
+      .container {
+        display: flex;
+        flex-direction: column;
+        max-width: 360px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      body {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 18px 14px;
+      }
+
+      .card h2 {
+        font-size: 16px;
+      }
+
+      .btn-primary,
+      .google-btn {
+        font-size: 13px;
+        padding: 9px;
+      }
+
+      input[type="email"],
+      input[type="password"],
+      input[type="text"] {
+        font-size: 13px;
+        height: 40px;
+        padding-left: 38px;
+      }
+
+      .footer-links {
+        flex-direction: column;
+        align-items: center;
+        font-size: 13px;
+      }
+
+      .or-line {
+        margin: 14px 0;
+      }
+
+      .google-btn img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="brand">
+      <div class="logo">
+        <img src="https://kvseberangperai.weebly.com/uploads/1/1/2/2/112256679/logo-kv-baharu_orig.png"
+          alt="KV Seberang Perai">
+      </div>
+      <h1>Smart Attendance — KV Seberang Perai</h1>
+      <p>Daftar akaun menggunakan Gmail anda untuk rekod kehadiran. Sistem ini menggunakan Firebase untuk keselamatan
+        dan penyimpanan data.</p>
+      <div class="feature-list">
+        <div class="feature">
+          <div class="icon">🔒</div>
+          <div>Safe and secure login system</div>
+        </div>
+        <div class="feature">
+          <div class="icon">⚡</div>
+          <div>Responsive design — works on all devices</div>
+        </div>
+        <div class="feature">
+          <div class="icon">📊</div>
+          <div>Smart analytics to monitor attendance performance</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Create your account</h2>
+      <p class="lead">Use your <strong>Gmail</strong> to sign up. After registration you'll be logged in automatically.
+      </p>
+
+      <div id="messageArea"></div>
+
+      <div class="field">
+        <label for="email">Email (Gmail)</label>
+        <input id="email" type="email" placeholder="you@gmail.com" autocomplete="email" />
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Min 6 characters" autocomplete="new-password" />
+          <!-- 只有左侧眼睛图标 -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="toggle-eye" viewBox="0 0 24 24" id="togglePw">
+            <path
+              d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
+          </svg>
+        </div>
+        <div class="field">
+          <label for="confirm">Confirm password</label>
+          <input id="confirm" type="password" placeholder="Repeat password" autocomplete="new-password" />
+          <!-- 只有左侧眼睛图标 -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="toggle-eye" viewBox="0 0 24 24" id="toggleConfirm">
+            <path
+              d="M12 5C7 5 2.73 8.11 1 12c1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="helper">Password must be at least 6 characters.</div>
+      <div id="error" class="error" style="display:none"></div>
+      <div id="success" class="success" style="display:none"></div>
+
+      <div style="margin-top:18px">
+        <button class="btn-primary" id="signupBtn" onclick="handleSignUp()">Create account</button>
+      </div>
+
+      <div class="or-line">or</div>
+      <div class="google-btn-container">
+        <button class="google-btn" onclick="signUpWithGoogle()">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+          <span>Sign up with Google</span>
+        </button>
+      </div>
+      <div id="authMessage"></div>
+
+
+      <div class="footer-links">
+        <span>Already have an account? <a href="index.html">Sign in</a></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDXM92nMwpSqPVWifILYeDMTMEh_fuhN5M",
+      authDomain: "drive-thru-smartattendance.firebaseapp.com",
+      databaseURL: "https://drive-thru-smartattendance-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "drive-thru-smartattendance",
+      storageBucket: "drive-thru-smartattendance.appspot.com",
+      messagingSenderId: "235048051665",
+      appId: "1:235048051665:web:a8c68cc40eb83946e9f6f0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
+    function showError(msg) {
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = msg;
+      document.getElementById('success').style.display = 'none';
+    }
+
+    function showSuccess(msg) {
+      document.getElementById('success').style.display = 'block';
+      document.getElementById('success').textContent = msg;
+      document.getElementById('error').style.display = 'none';
+    }
+
+    // Benarkan @gmail.com dan @moe.edu.my
+    function isGmail(email) {
+  return /\b[A-Za-z0-9._%+-]+@(gmail\.com|moe\.edu\.my|moe-dl\.edu\.my)$/i.test(email);
+    }
+
+    function setupToggle(idInput, idIcon) {
+      const input = document.getElementById(idInput);
+      const icon = document.getElementById(idIcon);
+
+      if (!input || !icon) return;
+
+      icon.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isHidden = input.type === "password";
+        input.type = isHidden ? "text" : "password";
+        icon.classList.toggle("active", isHidden);
+
+        setTimeout(() => {
+          input.blur();
+          input.focus({ preventScroll: true });
+        }, 10);
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // 确保只初始化左侧眼睛图标
+      setupToggle("password", "togglePw");
+      setupToggle("confirm", "toggleConfirm");
+
+      // 移除任何可能在右侧的眼睛图标
+      document.querySelectorAll('.toggle-eye').forEach(icon => {
+        const rect = icon.getBoundingClientRect();
+        const inputRect = icon.parentElement.querySelector('input').getBoundingClientRect();
+        // 如果图标在右侧，移除它
+        if (rect.left > inputRect.left + inputRect.width / 2) {
+          icon.remove();
+        }
+      });
+    });
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    async function signUpWithGoogle() {
+      const messageBox = document.getElementById("authMessage");
+      messageBox.textContent = "";
+      try {
+        const result = await firebase.auth().signInWithPopup(provider);
+        const email = result.user.email;
+
+        const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+
+        if (methods.length > 0) {
+          await firebase.auth().signOut();
+          messageBox.style.color = "red";
+          messageBox.textContent = "⚠️ Akaun ini sudah berdaftar. Sila log masuk.";
+          return;
+        }
+
+        const user = result.user;
+        await firebase.database().ref('users/' + user.uid).set({
+          email: user.email,
+          createdAt: new Date().toISOString(),
+          method: "google"
+        });
+
+        messageBox.style.color = "green";
+        messageBox.textContent = "✅ Akaun berjaya didaftarkan menggunakan Google!";
+        setTimeout(() => (window.location.href = "index.html"), 1500);
+
+      } catch (error) {
+        console.error(error);
+        messageBox.style.color = "red";
+        messageBox.textContent = "❌ Gagal daftar menggunakan Google. Cuba lagi.";
+      }
+    }
+
+
+    async function handleSignUp() {
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('password').value;
+      const conf = document.getElementById('confirm').value;
+
+      if (!email) return showError('Please enter your Gmail address.');
+      if (!isGmail(email)) return showError('Please use a valid email (example@gmail.com / name@moe.edu.my / name@moe-dl.edu.my).');
+      if (!pw || pw.length < 6) return showError('Password must be at least 6 characters.');
+      if (pw !== conf) return showError('Passwords do not match.');
+
+      const btn = document.getElementById('signupBtn');
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      btn.textContent = 'Creating...';
+
+      try {
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pw);
+        const user = userCredential.user;
+
+        await firebase.database().ref('users/' + user.uid).set({
+          email: user.email,
+          createdAt: new Date().toISOString()
+        });
+
+        showSuccess('Account created. Redirecting...');
+        setTimeout(() => (window.location.href = 'index.html'), 1500);
+      } catch (err) {
+        if (err.code === 'auth/email-already-in-use') {
+          showError('This email is already in use.');
+        } else if (err.code === 'auth/invalid-email') {
+          showError('Invalid email address.');
+        } else if (err.code === 'auth/weak-password') {
+          showError('Password too weak.');
+        } else {
+          showError(err.message || 'Registration failed.');
+        }
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.textContent = 'Create account';
+      }
+    }
+  </script>
+
+</body>
+
+</html>

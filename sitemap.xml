@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Halaman utama (root) -->
+  <url>
+    <loc>https://kehadiranteamnaufal.netlify.app/</loc>
+    <lastmod>2025-09-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Halaman utama versi index.html (pilihan tambahan SEO) -->
+  <url>
+    <loc>https://kehadiranteamnaufal.netlify.app/index.html</loc>
+    <lastmod>2025-09-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Dashboard -->
+  <url>
+    <loc>https://kehadiranteamnaufal.netlify.app/dashboard.html</loc>
+    <lastmod>2025-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Lupa Kata Laluan -->
+  <url>
+    <loc>https://kehadiranteamnaufal.netlify.app/forgot.html</loc>
+    <lastmod>2025-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>
